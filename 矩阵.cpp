@@ -136,29 +136,56 @@ matrixStr* matDot(matrixStr* a,matrixStr* b)
 	return (matrixStr*)-1;
 }
 
+//返回矩阵的转置
+//注意，如果不再需要需要释放内存
+matrixStr* matrix_T(matrixStr* mat)
+{
+	u32 L = 0;	//行
+	u32 H = 0;	//列
+	matrixStr* mat_t = matMalloc(mat->list,mat->line);
+	mat_t->line = mat->list;
+	mat_t->list = mat->line;
+
+	for(L = 0; L < mat_t->line; L ++)
+	{
+		for(H = 0; H < mat_t->list; H ++)
+		{
+			*Get_MatAddr(mat_t,L,H) = Get_Mat(mat,H,L);
+		}
+	}
+	return mat_t;
+
+}
+
+
+//测试代码
+
 int main()
 {
 	matDAT a1[] = {
 			3,1,2,
 			-5,4,1,
-			0,3,-8
 	};
 	matDAT a2[] = {
-			0,5,-1,
-			3,2,-1,
-			10,0.5f,4
+			0,5,
+			3,2,
+			10,0.5f
 	};
 
-	matrixStr* mat1 = matMalloc(3,3);
+	matrixStr* mat1 = matMalloc(2,3);
 	matApendDat(mat1,a1);
 	PrintMat(mat1);
+	printf("*********\r\n");
+	PrintMat(matrix_T(mat1));
 	printf("-------\r\n");
-	matrixStr* mat2 = matMalloc(3,3);
+	matrixStr* mat2 = matMalloc(3,2);
 	matApendDat(mat2,a2);
 	PrintMat(mat2);
+	printf("*********\r\n");
+	PrintMat(matrix_T(mat2));
 	printf("-------\r\n");
 	matrixStr* mat3 = matDot(mat1,mat2);
 	PrintMat(mat3);
-
+	
 	return 0;
 }
