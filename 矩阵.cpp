@@ -98,6 +98,7 @@ matrixStr* matAdd(matrixStr* a,matrixStr* b)
 }
 
 //相乘，相加 ,a的第几行跟b的第几列相乘相加
+// 返回相乘的结果
 matDAT GetMat_MultAdd(matrixStr* a,matrixStr* b,u32 aline,u32 blist)
 {
 	u32 i = 0;
@@ -112,7 +113,8 @@ matDAT GetMat_MultAdd(matrixStr* a,matrixStr* b,u32 aline,u32 blist)
 }
 
 //矩阵相乘
-matrixStr* matMult(matrixStr* a,matrixStr* b)
+//返回一个乘积结果矩阵
+matrixStr* matDot(matrixStr* a,matrixStr* b)
 {
 
 	if( a->list == b->line)
@@ -155,7 +157,7 @@ int main()
 	matApendDat(mat2,a2);
 	PrintMat(mat2);
 	printf("-------\r\n");
-	matrixStr* mat3 = matMult(mat1,mat2);
+	matrixStr* mat3 = matDot(mat1,mat2);
 	PrintMat(mat3);
 
 	return 0;
