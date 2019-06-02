@@ -3,6 +3,8 @@
 #include <string.h>
 #include <malloc.h>
 
+#define	ERROR_MAT_LOG	printf
+#define	MAT_LOG	printf
 typedef	 unsigned char u8;
 typedef	 unsigned  int u32;
 typedef	 float  matDAT;
@@ -12,6 +14,12 @@ typedef struct
 	u32 line;	//行数
 	u32 list;	//列数
 }matrixStr;
+
+typedef struct
+{
+
+}numpy;	//仿Python的numpy
+
 
 // 申请一个矩阵
 matrixStr* matMalloc(u32 line,u32 list)
@@ -52,9 +60,9 @@ void PrintMat(matrixStr* mat)
 	{
 		for(H = 0; H < mat->list; H ++)
 		{
-			printf("%f	",*((matDAT*)(&mat->list+ 1 + L*mat->list + H)));
+			MAT_LOG("%f	",*((matDAT*)(&mat->list+ 1 + L*mat->list + H)));
 		}
-		printf("\r\n");
+		MAT_LOG("\r\n");
 	}
 }
 
@@ -93,7 +101,8 @@ matrixStr* matAdd(matrixStr* a,matrixStr* b)
 			}		
 		}
 		return mat;
-	}
+	}else ERROR_MAT_LOG("错误：两个矩阵行列数不相等!\r\n");
+
 	return (matrixStr*)-1;
 }
 
@@ -122,8 +131,6 @@ matrixStr* matDot(matrixStr* a,matrixStr* b)
 		u32 L = 0;
 		u32 H = 0;
 		matrixStr* mat = matMalloc(a->line,b->list);
-		mat->line = a->line;
-		mat->list = b->list;
 		for(L = 0; L < a->line; L ++)
 		{
 			for(H = 0; H < b->list; H ++)
@@ -132,7 +139,7 @@ matrixStr* matDot(matrixStr* a,matrixStr* b)
 			}		
 		}
 		return mat;
-	}
+	}else ERROR_MAT_LOG("错误：A的列数与B的行数不相等，不能做乘法\r\n");
 	return (matrixStr*)-1;
 }
 
@@ -143,8 +150,6 @@ matrixStr* matrix_T(matrixStr* mat)
 	u32 L = 0;	//行
 	u32 H = 0;	//列
 	matrixStr* mat_t = matMalloc(mat->list,mat->line);
-	mat_t->line = mat->list;
-	mat_t->list = mat->line;
 
 	for(L = 0; L < mat_t->line; L ++)
 	{
@@ -157,8 +162,23 @@ matrixStr* matrix_T(matrixStr* mat)
 
 }
 
+//生成一个矩阵，并全部赋值成1
+matrixStr* matrix_One(u32 line,u32 list)
+{
+	u32 L = 0;	//行
+	u32 H = 0;	//列
+	matrixStr* mat = matMalloc(line,list);
+	for(L = 0; L < mat->line; L ++)
+	{
+		for(H = 0; H < mat->list; H ++)
+		{
+			*Get_MatAddr(mat,L,H) = 1;
+		}
+	}
+	return mat;
+}
 
-//测试代码
+// 测试代码
 
 int main()
 {
@@ -171,21 +191,30 @@ int main()
 			3,2,
 			10,0.5f
 	};
+	printf("申请一个矩阵:\r\n");
+	matrixStr* mat1 = matMalloc(2,3);	// 申请一个矩阵
+	matApendDat(mat1,a1);				// 给这个矩阵赋值
+	PrintMat(mat1);						// 打印矩阵
+	 
+	printf("打印矩阵的转置:\r\n");
+	PrintMat(matrix_T(mat1));			// 打印矩阵的转置
 
-	matrixStr* mat1 = matMalloc(2,3);
-	matApendDat(mat1,a1);
-	PrintMat(mat1);
-	printf("*********\r\n");
-	PrintMat(matrix_T(mat1));
-	printf("-------\r\n");
+	printf("申请一个矩阵:\r\n");
 	matrixStr* mat2 = matMalloc(3,2);
 	matApendDat(mat2,a2);
 	PrintMat(mat2);
-	printf("*********\r\n");
+
+	printf("打印矩阵的转置:\r\n");
 	PrintMat(matrix_T(mat2));
-	printf("-------\r\n");
-	matrixStr* mat3 = matDot(mat1,mat2);
+
+	printf("将两个矩阵相乘:\r\n");
+	matrixStr* mat3 = matDot(mat1,mat2);// 将两个矩阵相乘
 	PrintMat(mat3);
-	
+
+	printf("申请一个矩阵，并全部赋值为1:\r\n");
+	matrixStr* mat4 = matrix_One(6,1);	// 申请一个矩阵，并全部赋值为1
+	PrintMat(mat4);
+
+
 	return 0;
 }
